@@ -74,10 +74,10 @@ TrailRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Time: 5
+  m_Time: 20
   m_Parameters:
     serializedVersion: 3
-    widthMultiplier: 200
+    widthMultiplier: 500
     widthCurve:
       serializedVersion: 2
       m_Curve:

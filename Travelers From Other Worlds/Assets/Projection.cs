@@ -15,33 +15,26 @@ public class Projection : MonoBehaviour {
     CelestialBody[] celestialBodies;
     CelestialBody[] celestialBodiesSim;
     Clone[] clones;
+    public GameObject SimBody;
     private int counter = 0;
     private void Start() {
         celestialBodies = FindObjectsOfType<CelestialBody>();
         CreatePhysicsScene();
         clones = FindObjectsOfType<Clone>();
-        foreach(Clone go in clones)
-        {
-            go.GetComponent<MeshRenderer>().enabled=false;
-            if(go.name==ReferenceName+"(Clone)") 
-            {
-                ReferenceBody = go.gameObject;
-                origin = go.transform.position;
-                hasReferenceBody=true;
-            }
-        }
     }
     private void Update() {
     }
     private void FixedUpdate() {
         counter++;
+        
         Sim();
-        if(counter>_maxIterations)
+        
+        if (counter>_maxIterations)
         {
             ResetPozition();
             if(hasReferenceBody)
             {
-                origin=ReferenceBody.transform.position;
+                origin = ReferenceBody.transform.position;
             }
             counter=0;
         }
@@ -55,6 +48,7 @@ public class Projection : MonoBehaviour {
             clone.gameObject.transform.rotation=clone.parent.transform.rotation;
             clone.gameObject.GetComponent<Rigidbody>().position=clone.parent.GetComponent<Rigidbody>().position;
             clone.gameObject.GetComponent<Rigidbody>().velocity=clone.parent.GetComponent<Rigidbody>().velocity;
+            clone.gameObject.GetComponentInChildren<TrailRenderer>().Clear();
         }
     }
     private void Sim()
@@ -63,16 +57,19 @@ public class Projection : MonoBehaviour {
         {
             if(hasReferenceBody)
         {
-            distance = ReferenceBody.transform.position-origin;
+                origin = ReferenceBody.GetComponent<Clone>().parent.transform.position;
+                distance = ReferenceBody.transform.position-origin;
             foreach(Clone go in clones)
             {
                 go.transform.position -= distance;
+                    for(int j=1;i<= go.GetComponentInChildren<TrailRenderer>().positionCount;j++)
+                go.GetComponentInChildren<TrailRenderer>().SetPosition(j,go.GetComponentInChildren<TrailRenderer>().GetPosition(j)- distance);
             }
         }
             _physicsScene.Simulate(Time.fixedDeltaTime*step);
             foreach(Clone clone in clones) {
                 clone.gameObject.GetComponent<CelestialBody>().ApplyGravity();
-                //clone.gameObject.GetComponentInChildren<TrailRenderer>().AddPosition(clone.gameObject.transform.position);
+                clone.gameObject.GetComponentInChildren<TrailRenderer>().AddPosition(clone.gameObject.transform.position);
             }
         }
     }
@@ -80,12 +77,22 @@ public class Projection : MonoBehaviour {
         _simulationScene = SceneManager.CreateScene("Simulation", new CreateSceneParameters(LocalPhysicsMode.Physics3D));
         _physicsScene = _simulationScene.GetPhysicsScene();
         foreach(CelestialBody body in celestialBodies){
-            var genobj = Instantiate(body.gameObject, body.transform.position, body.transform.rotation);
+            var genobj = Instantiate(SimBody, body.transform.position, body.transform.rotation);
             genobj.AddComponent<Clone>();
             genobj.GetComponent<Clone>().parent= body.gameObject;
             genobj.GetComponent<Rigidbody>().detectCollisions=false;
             genobj.GetComponent<CelestialBody>().isClone=true;
+            genobj.GetComponent<CelestialBody>().radius = body.radius;
+            genobj.GetComponent<CelestialBody>().mass = body.mass;
+            genobj.GetComponent<CelestialBody>().surfaceGravity = body.surfaceGravity;
+            SimBody.name = body.name;
             SceneManager.MoveGameObjectToScene(genobj, _simulationScene);
+            if (ReferenceBody == body.gameObject)
+            {
+                ReferenceBody = genobj;
+                origin = genobj.transform.position;
+                hasReferenceBody = true;
+            }
         }
     }
 }
