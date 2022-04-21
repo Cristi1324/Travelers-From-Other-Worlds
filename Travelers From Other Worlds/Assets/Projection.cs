@@ -62,7 +62,7 @@ public class Projection : MonoBehaviour {
             foreach(Clone go in clones)
             {
                 go.transform.position -= distance;
-                    for(int j=1;i<= go.GetComponentInChildren<TrailRenderer>().positionCount;j++)
+                    for(int j=1;j<= go.GetComponentInChildren<TrailRenderer>().positionCount;j++)
                 go.GetComponentInChildren<TrailRenderer>().SetPosition(j,go.GetComponentInChildren<TrailRenderer>().GetPosition(j)- distance);
             }
         }
