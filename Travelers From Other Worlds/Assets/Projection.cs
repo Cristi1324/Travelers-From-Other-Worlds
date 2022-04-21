@@ -21,25 +21,29 @@ public class Projection : MonoBehaviour {
         celestialBodies = FindObjectsOfType<CelestialBody>();
         CreatePhysicsScene();
         clones = FindObjectsOfType<Clone>();
+        foreach(Clone clone in clones) {
+            clone.name=clone.parent.name+"(Clone)";
+        }
     }
     private void Update() {
     }
     private void FixedUpdate() {
-        counter++;
-        
-        Sim();
-        
-        if (counter>_maxIterations)
+        if(counter==0)
         {
             ResetPozition();
             if(hasReferenceBody)
             {
                 origin = ReferenceBody.transform.position;
             }
+        }else{
+            Sim();
+        }
+        counter++;
+        if (counter>_maxIterations)
+        {
             counter=0;
         }
     }
-
     private void ResetPozition()
     {
         foreach(Clone clone in clones)
@@ -55,6 +59,7 @@ public class Projection : MonoBehaviour {
     {
         for(int i=1;i<=_maxIterationsPerUpdate;i++)
         {
+            _physicsScene.Simulate(Time.fixedDeltaTime*step);
             if(hasReferenceBody)
         {
                 origin = ReferenceBody.GetComponent<Clone>().parent.transform.position;
@@ -62,11 +67,8 @@ public class Projection : MonoBehaviour {
             foreach(Clone go in clones)
             {
                 go.transform.position -= distance;
-                    for(int j=1;j<= go.GetComponentInChildren<TrailRenderer>().positionCount;j++)
-                go.GetComponentInChildren<TrailRenderer>().SetPosition(j,go.GetComponentInChildren<TrailRenderer>().GetPosition(j)- distance);
             }
         }
-            _physicsScene.Simulate(Time.fixedDeltaTime*step);
             foreach(Clone clone in clones) {
                 clone.gameObject.GetComponent<CelestialBody>().ApplyGravity();
                 clone.gameObject.GetComponentInChildren<TrailRenderer>().AddPosition(clone.gameObject.transform.position);
@@ -85,7 +87,7 @@ public class Projection : MonoBehaviour {
             genobj.GetComponent<CelestialBody>().radius = body.radius;
             genobj.GetComponent<CelestialBody>().mass = body.mass;
             genobj.GetComponent<CelestialBody>().surfaceGravity = body.surfaceGravity;
-            SimBody.name = body.name;
+            genobj.GetComponentInChildren<TrailRenderer>().widthMultiplier = body.radius/10;
             SceneManager.MoveGameObjectToScene(genobj, _simulationScene);
             if (ReferenceBody == body.gameObject)
             {
