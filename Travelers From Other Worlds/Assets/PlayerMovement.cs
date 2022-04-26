@@ -5,18 +5,15 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     public LayerMask walkableMask;
-
-    public float maxAcceleration;
     public Transform feet;
     public float walkSpeed = 8;
     public float runSpeed = 14;
     public float jumpForce = 20;
     public float vSmoothTime = 0.1f;
     public float airSmoothTime = 0.5f;
-    public float stickToGroundForce = 8;
+    public bool done=false;
 
     public bool lockCursor;
-    public float mass = 70;
     Rigidbody rb;
 
     public float mouseSensitivity = 10;
@@ -35,13 +32,13 @@ public class PlayerMovement : MonoBehaviour
     Vector3 cameraLocalPos;
     Vector3 smoothVelocity;
     Vector3 smoothVRef;
-
     CelestialBody referenceBody;
-
     Camera cam;
     bool readyToFlyShip;
     public Vector3 delta;
-    public bool isGrounded;
+    bool isGrounded;
+    public Transform playerBody;
+    Vector3 strongestGravitionalPull = Vector3.zero;
     private void Update() {
         HandleMovement ();
     }
@@ -58,17 +55,16 @@ public class PlayerMovement : MonoBehaviour
     }
 
     void InitRigidbody () {
-        rb = GetComponent<Rigidbody> ();
-        rb.interpolation = RigidbodyInterpolation.Interpolate;
+        rb = GetComponentInChildren<Rigidbody> ();
+        rb.interpolation = RigidbodyInterpolation.None;
         rb.useGravity = false;
         rb.isKinematic = false;
-        rb.mass = mass;
     }
     bool IsGrounded () {
         // Sphere must not overlay terrain at origin otherwise no collision will be detected
         // so rayRadius should not be larger than controller's capsule collider radius
-        const float rayRadius = .3f;
-        const float groundedRayDst = .2f;
+        const float rayRadius = 0.3f;
+        const float groundedRayDst = 0.5f;
         bool grounded = false;
 
         if (referenceBody) {
@@ -81,6 +77,7 @@ public class PlayerMovement : MonoBehaviour
                 Vector3 rayDir = -transform.up;
 
                 grounded = Physics.SphereCast (rayOrigin, rayRadius, rayDir, out hit, groundedRayDst, walkableMask);
+                //Debug.DrawRay(rayOrigin,rayDir,Color.red,10f);
             }
         }
 
@@ -96,51 +93,53 @@ public class PlayerMovement : MonoBehaviour
         float smoothYawOld = smoothYaw;
         smoothYaw = Mathf.SmoothDampAngle (smoothYaw, yaw, ref yawSmoothV, rotationSmoothTime);
         cam.transform.localEulerAngles = Vector3.right * smoothPitch;
-        transform.Rotate (Vector3.up * Mathf.DeltaAngle (smoothYawOld, smoothYaw), Space.Self);
+        playerBody.transform.Rotate (Vector3.up * Mathf.DeltaAngle (smoothYawOld, smoothYaw), Space.Self);
 
         // Movement
-        //isGrounded = IsGrounded();
+        isGrounded = IsGrounded();
         Vector3 input = new Vector3 (Input.GetAxisRaw ("Horizontal"), 0, Input.GetAxisRaw ("Vertical"));
         float currentSpeed = Input.GetKey (KeyCode.LeftShift) ? runSpeed : walkSpeed;
-        targetVelocity = transform.TransformDirection (input.normalized) * currentSpeed;
+        targetVelocity = playerBody.transform.TransformDirection (input.normalized) * currentSpeed;
         smoothVelocity = Vector3.SmoothDamp (smoothVelocity, targetVelocity, ref smoothVRef, (isGrounded) ? vSmoothTime : airSmoothTime);
 
         if (isGrounded) {
             if (Input.GetKeyDown (KeyCode.Space)) {
-                rb.AddForce (transform.up * jumpForce, ForceMode.VelocityChange);
+                rb.AddForce (playerBody.transform.up * jumpForce, ForceMode.VelocityChange);
                 isGrounded = false;
             } else {
                 // Apply small downward force to prevent player from bouncing when going down slopes
-                rb.AddForce (-transform.up * stickToGroundForce, ForceMode.VelocityChange);
+                //rb.AddForce (-transform.up * stickToGroundForce, ForceMode.VelocityChange);
             }
         }
     }
 
     
 
-    void FixedUpdate () {
+    void FixedUpdate() {
+        done=false;
         CelestialBody[] bodies = FindObjectsOfType<CelestialBody>();
-        Vector3 strongestGravitionalPull = Vector3.zero;
-
+        float maxAcceleration=0;
+        CelestialBody maxAccelerationBody = null;
         // Gravity
         foreach (CelestialBody body in bodies) {
             float sqrDst = (body.transform.position - rb.position).sqrMagnitude;
             Vector3 forceDir = (body.transform.position - rb.position).normalized;
-            Vector3 acceleration = forceDir * 66.7408f * body.mass * rb.mass/ sqrDst;
-            rb.AddForce (acceleration, ForceMode.Acceleration);
+            Vector3 acceleration = forceDir * 6.67408f * body.mass * rb.mass/ sqrDst;
+            rb.AddForce (acceleration);
 
             // Find body with strongest gravitational pull 
-            if (acceleration.sqrMagnitude > strongestGravitionalPull.sqrMagnitude) {
-                strongestGravitionalPull = acceleration;
-                referenceBody = body;
+            if (maxAcceleration < acceleration.magnitude) {
+                maxAcceleration=acceleration.magnitude;
+                maxAccelerationBody=body;
             }
+            //transform.position=rb.position;
         }
-
+        referenceBody = maxAccelerationBody;
         // Rotate to align with gravity up
-        Vector3 gravityUp = -strongestGravitionalPull.normalized;
-        rb.rotation = Quaternion.FromToRotation (transform.up, gravityUp) * rb.rotation;
+        playerBody.rotation = Quaternion.FromToRotation (playerBody.transform.up, playerBody.transform.position - referenceBody.transform.position) * playerBody.transform.rotation;
 
         // Move
-        rb.MovePosition (rb.position + smoothVelocity * Time.fixedDeltaTime);
+        rb.MovePosition (playerBody.position + smoothVelocity * Time.fixedDeltaTime);
+        done=true;
     }
 }

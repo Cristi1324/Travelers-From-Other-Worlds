@@ -15,6 +15,7 @@ public class Projection : MonoBehaviour {
     CelestialBody[] celestialBodies;
     CelestialBody[] celestialBodiesSim;
     Clone[] clones;
+    public GameObject player;
     public GameObject SimBody;
     private int counter = 0;
     private void Start() {

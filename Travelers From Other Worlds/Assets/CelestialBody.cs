@@ -4,7 +4,7 @@ using UnityEngine;
 [ExecuteInEditMode]
 [RequireComponent (typeof (Rigidbody))]
 public class CelestialBody : MonoBehaviour {
-    private float gravityConstant = 667.408f;
+    private float gravityConstant = 6.67408f;
     public float radius;
     public float surfaceGravity;
     public Vector3 initialVelocity;
@@ -18,7 +18,9 @@ public class CelestialBody : MonoBehaviour {
         rb.mass = mass;
         rb.velocity = initialVelocity;
     }
+    private void Update() {
 
+    }
     private void FixedUpdate() {
         if(!isClone)ApplyGravity();
     }
@@ -33,7 +35,7 @@ public class CelestialBody : MonoBehaviour {
                 float sqrDst = (body.rb.position - rb.position).sqrMagnitude;
                 Vector3 forceDir = (rb.position - body.rb.position).normalized;
                 Vector3 acceleration = forceDir * gravityConstant * body.mass * mass / sqrDst;
-                body.rb.AddForce(acceleration);
+                if(acceleration.magnitude>0)body.rb.AddForce(acceleration);
             }
         }
         
