@@ -8,6 +8,7 @@ public class CenterWorld : MonoBehaviour
     private float distanceFromOrigin;
     private List<Transform> physicsObjects;
     public GameObject player;
+    public GameObject ship;
     private Vector3 originOffset;
     Camera playerCamera;
     public CelestialBody[] bodies;
@@ -15,9 +16,11 @@ public class CenterWorld : MonoBehaviour
 
     void Awake () {
         bodies = FindObjectsOfType<CelestialBody> ();
+        ship=FindObjectOfType<ShipController>().gameObject;
         playerCamera = Camera.main;
         physicsObjects = new List<Transform> ();
         physicsObjects.Add (player.transform);
+        physicsObjects.Add(ship.transform);
         foreach (var c in bodies) {
             physicsObjects.Add (c.transform);
         }
