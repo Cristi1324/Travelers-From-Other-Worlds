@@ -35,7 +35,7 @@ public class CelestialBody : MonoBehaviour {
                 float sqrDst = (body.rb.position - rb.position).sqrMagnitude;
                 Vector3 forceDir = (rb.position - body.rb.position).normalized;
                 Vector3 acceleration = forceDir * gravityConstant * body.mass * mass / sqrDst;
-                if(acceleration.magnitude>0)body.rb.AddForce(acceleration);
+                if(acceleration.magnitude>0 && !float.IsInfinity(acceleration.magnitude))body.rb.AddForce(acceleration);
             }
         }
         

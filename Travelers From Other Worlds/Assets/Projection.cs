@@ -63,6 +63,7 @@ public class Projection : MonoBehaviour {
             _physicsScene.Simulate(Time.fixedDeltaTime*step);
             if(hasReferenceBody)
         {
+                
                 origin = ReferenceBody.GetComponent<Clone>().parent.transform.position;
                 distance = ReferenceBody.transform.position-origin;
             foreach(Clone go in clones)
@@ -72,7 +73,7 @@ public class Projection : MonoBehaviour {
         }
             foreach(Clone clone in clones) {
                 clone.gameObject.GetComponent<CelestialBody>().ApplyGravity();
-                clone.gameObject.GetComponentInChildren<TrailRenderer>().AddPosition(clone.gameObject.transform.position);
+                //clone.gameObject.GetComponentInChildren<TrailRenderer>().AddPosition(clone.gameObject.transform.position);
             }
         }
     }

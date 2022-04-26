@@ -6,6 +6,7 @@ public class PlayerMovement : MonoBehaviour
 {
     public LayerMask walkableMask;
     public Transform feet;
+    private float gravityConstant = 6.67408f;
     public float walkSpeed = 8;
     public float runSpeed = 14;
     public float jumpForce = 20;
@@ -27,6 +28,7 @@ public class PlayerMovement : MonoBehaviour
 
     float yawSmoothV;
     float pitchSmoothV;
+    public float relativeVelocityMagnitude;
 
     public Vector3 targetVelocity;
     Vector3 cameraLocalPos;
@@ -34,6 +36,7 @@ public class PlayerMovement : MonoBehaviour
     Vector3 smoothVRef;
     CelestialBody referenceBody;
     Camera cam;
+    Camera mapCamera;
     bool readyToFlyShip;
     public Vector3 delta;
     bool isGrounded;
@@ -41,9 +44,23 @@ public class PlayerMovement : MonoBehaviour
     Vector3 strongestGravitionalPull = Vector3.zero;
     private void Update() {
         HandleMovement ();
+        if(Input.GetKeyDown(KeyCode.M))
+        {
+            mapCamera.enabled = true;
+            cam.enabled=false;
+            //Time.timeScale=0;
+        }
+        if(Input.GetKeyUp(KeyCode.M))
+        {
+            mapCamera.enabled = false;
+            cam.enabled=true;
+            //Time.timeScale=1;
+        }
     }
 
     void Awake () {
+        mapCamera = FindObjectOfType<MapCamera>().GetComponent<Camera>();
+        mapCamera.enabled=false;
         cam = GetComponentInChildren<Camera> ();
         cameraLocalPos = cam.transform.localPosition;
         InitRigidbody ();
@@ -69,6 +86,7 @@ public class PlayerMovement : MonoBehaviour
 
         if (referenceBody) {
             var relativeVelocity = rb.velocity - referenceBody.GetComponent<Rigidbody>().velocity;
+            relativeVelocityMagnitude=relativeVelocity.magnitude;
             // Don't cast ray down if player is jumping up from surface
             if (relativeVelocity.y <= jumpForce * .5f) {
                 RaycastHit hit;
@@ -77,7 +95,7 @@ public class PlayerMovement : MonoBehaviour
                 Vector3 rayDir = -transform.up;
 
                 grounded = Physics.SphereCast (rayOrigin, rayRadius, rayDir, out hit, groundedRayDst, walkableMask);
-                //Debug.DrawRay(rayOrigin,rayDir,Color.red,10f);
+                Debug.DrawRay(rayOrigin,rayDir,Color.red,1000f);
             }
         }
 
@@ -122,9 +140,9 @@ public class PlayerMovement : MonoBehaviour
         CelestialBody maxAccelerationBody = null;
         // Gravity
         foreach (CelestialBody body in bodies) {
-            float sqrDst = (body.transform.position - rb.position).sqrMagnitude;
-            Vector3 forceDir = (body.transform.position - rb.position).normalized;
-            Vector3 acceleration = forceDir * 6.67408f * body.mass * rb.mass/ sqrDst;
+            float sqrDst = (body.GetComponent<Rigidbody>().position - rb.position).sqrMagnitude;
+            Vector3 forceDir = -(rb.position - body.GetComponent<Rigidbody>().position).normalized;
+            Vector3 acceleration = forceDir * gravityConstant * body.mass * rb.mass / sqrDst;
             rb.AddForce (acceleration);
 
             // Find body with strongest gravitational pull 

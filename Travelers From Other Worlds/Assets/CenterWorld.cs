@@ -10,10 +10,11 @@ public class CenterWorld : MonoBehaviour
     public GameObject player;
     private Vector3 originOffset;
     Camera playerCamera;
+    public CelestialBody[] bodies;
     public event System.Action PostFloatingOriginUpdate;
 
     void Awake () {
-        var bodies = FindObjectsOfType<CelestialBody> ();
+        bodies = FindObjectsOfType<CelestialBody> ();
         playerCamera = Camera.main;
         physicsObjects = new List<Transform> ();
         physicsObjects.Add (player.transform);

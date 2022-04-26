@@ -7,6 +7,7 @@ TagManager:
   - CelestialBody
   - Sun
   - PlayerBody
+  - MapCamera
   layers:
   - Default
   - TransparentFX
