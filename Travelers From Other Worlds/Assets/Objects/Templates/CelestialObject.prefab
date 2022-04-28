@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 710936443892850327}
   - component: {fileID: 8300581928996710496}
   - component: {fileID: 6769514361072098577}
+  - component: {fileID: -2340076587907389942}
   m_Layer: 0
   m_Name: CelestialObject
   m_TagString: CelestialBody
@@ -30,7 +31,7 @@ Transform:
   m_LocalScale: {x: 1000, y: 1000, z: 1000}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 7686175177499973908}
+  - {fileID: 6462709497785696361}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -62,9 +63,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 759d9d4fb6807f0469a34c4c3498bbf5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  radius: 0
+  surfaceGravity: 0
   initialVelocity: {x: 0, y: 0, z: 0}
   mass: 0
-  simMult: 1
+  isClone: 0
+--- !u!135 &-2340076587907389942
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 874406022551462126}
+  m_Material: {fileID: 13400000, guid: bc00740f0423190478a8ba15315e25db, type: 2}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 1000
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &3827501758190988071
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -139,9 +155,9 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3d2e294b2cf7c1942adfb9d4f5bd9bdc, type: 3}
---- !u!4 &7686175177499973908 stripped
+--- !u!4 &6462709497785696361 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: 6896351369115447859, guid: 3d2e294b2cf7c1942adfb9d4f5bd9bdc,
+  m_CorrespondingSourceObject: {fileID: 7831245858827365198, guid: 3d2e294b2cf7c1942adfb9d4f5bd9bdc,
     type: 3}
   m_PrefabInstance: {fileID: 3827501758190988071}
   m_PrefabAsset: {fileID: 0}

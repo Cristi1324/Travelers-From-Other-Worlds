@@ -32,10 +32,6 @@ public class Projection : MonoBehaviour {
         if(counter==0)
         {
             ResetPozition();
-            if(hasReferenceBody)
-            {
-                origin = ReferenceBody.transform.position;
-            }
         }else{
             Sim();
         }

@@ -7,7 +7,7 @@ public class CenterWorld : MonoBehaviour
     public float distanceThreshold = 1000;
     private float distanceFromOrigin;
     private List<Transform> physicsObjects;
-    public GameObject player;
+    public Transform player;
     public GameObject ship;
     private Vector3 originOffset;
     Camera playerCamera;
@@ -16,25 +16,37 @@ public class CenterWorld : MonoBehaviour
 
     void Awake () {
         bodies = FindObjectsOfType<CelestialBody> ();
-        ship=FindObjectOfType<ShipController>().gameObject;
+        player = FindObjectOfType<PlayerController>().transform;
+        ship= FindObjectOfType<ShipController>().gameObject;
         playerCamera = Camera.main;
         physicsObjects = new List<Transform> ();
         physicsObjects.Add (player.transform);
-        physicsObjects.Add(ship.transform);
+        if(ship!=null)physicsObjects.Add(ship.transform);
         foreach (var c in bodies) {
             physicsObjects.Add (c.transform);
         }
     }
 
     void FixedUpdate () {
-        UpdateFloatingOrigin ();
-        if (PostFloatingOriginUpdate != null) {
-            PostFloatingOriginUpdate ();
+        if(player!=null||ship!=null)
+        {
+            UpdateFloatingOrigin ();
+            if (PostFloatingOriginUpdate != null)
+            {
+                PostFloatingOriginUpdate ();
+            }
         }
     }
 
     void UpdateFloatingOrigin () {
-        originOffset = player.transform.position;
+        if(player!=null)
+        {
+            originOffset = player.transform.position;
+        }else
+        {
+            originOffset = ship.transform.position;
+        }
+        
         float distanceFromOrigin = originOffset.magnitude;
 
         if (distanceFromOrigin > distanceThreshold) {
@@ -42,6 +54,5 @@ public class CenterWorld : MonoBehaviour
                 t.position -= originOffset;
             }
         }
-        
     }
 }
