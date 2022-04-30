@@ -44,18 +44,6 @@ public class PlayerController : MonoBehaviour
     Vector3 strongestGravitionalPull = Vector3.zero;
     private void Update() {
         HandleMovement ();
-        if(Input.GetKeyDown(KeyCode.M))
-        {
-            mapCamera.enabled = true;
-            cam.enabled=false;
-            //Time.timeScale=0;
-        }
-        if(Input.GetKeyUp(KeyCode.M))
-        {
-            mapCamera.enabled = false;
-            cam.enabled=true;
-            //Time.timeScale=1;
-        }
     }
 
     void Awake () {

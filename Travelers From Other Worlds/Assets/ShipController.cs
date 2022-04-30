@@ -6,7 +6,9 @@ public class ShipController : MonoBehaviour
 {
     // Start is called before the first frame update
     Rigidbody rb;
+    public GameObject player;
     public CameraController mainCamera;
+    public Vector3 unboardPosition;
     private float gravityConstant = 6.67408f;
     bool propUp = false;
     bool propDown = false;
@@ -28,10 +30,38 @@ public class ShipController : MonoBehaviour
     public Vector3 propPower;
     public Vector3 propPowerNegative;
     public Camera cam;
+    public Camera mapCamera;
     public Vector3 rotationChange;
+    public Vector3 rotateDirection;
+    public Vector3 relativeVelocity;
+    ParticleSystem EngineParticlesForward;
+    public bool isRotating = true;
+    Rigidbody ReferenceBody;
+    public bool enableMouseControls;
+    public Vector3 crosshairPosition;
+    public Vector3 progradePosition;
+    public bool showCrosshairs;
+    public bool showMotionVectors;
+    public bool hasTarget;
+    public Transform TargetBody;
+    public Vector3 targetPosition;
+    Projection projection;
+    public float apparentSize;
+    public Vector3 relativeTargetVelocity;
+    public Vector3 targetDirection;
+    public float targetDistance;
+    public float relativeTargetVelocityMagnitude;
+    void Start()
+    {
+        projection = FindObjectOfType<Projection>();
+        cam.enabled=false;
+    }
     void Awake()
     {
+        mapCamera = GameObject.Find("MapCamera").GetComponent<Camera>();
         rb = GetComponent<Rigidbody>();
+        enableMouseControls=true;
+        EngineParticlesForward = GameObject.Find("ParticlesMainEngine").GetComponent<ParticleSystem>();
     }
 
     // Update is called once per frame
@@ -66,23 +96,62 @@ public class ShipController : MonoBehaviour
         {
             propUp = true;
         }else propUp = false;
+        if(Input.GetKeyDown(KeyCode.F))
+        {
+            UnboardShip();
+        }
+        if(Input.GetKeyDown(KeyCode.M))
+        {
+            mapCamera.enabled = true;
+            cam.enabled=false;
+            mapCamera.GetComponent<MapCamera>().enabled=true;
+            hasPlayer=false;
+            FindObjectOfType<Projection>().enabled=true;
+        }
+        UpdateCamera();
+        MouseControls();
         }
         targetProp = new Vector3(
             System.Convert.ToInt32(propForward)-System.Convert.ToInt32(propBackward),
             System.Convert.ToInt32(propUp)-System.Convert.ToInt32(propDown),
-            System.Convert.ToInt32(propLeft)-System.Convert.ToInt32(propRight)
+            System.Convert.ToInt32(propRight)-System.Convert.ToInt32(propLeft)
         );
-        if(Input.GetKey(KeyCode.Q))
-        {
-
-        }
-        MouseControls();
-        UpdateCamera();
+    }
+    private void OnCollisionStay(Collision other) {
+        if(other.gameObject.layer==8)
+            isRotating=false;
+    }
+    private void OnCollisionExit(Collision other) {
+        if(other.gameObject.layer==8)
+            isRotating=true;
+    }
+    internal void BoardPlayer(GameObject player)
+    {
+        this.player = player;
+        hasPlayer=true;
+        cam.enabled=true;
+        player.transform.parent = transform;
+        cam.GetComponent<CameraController>().enabled = true;
+    }
+    void UnboardShip()
+    {
+        hasPlayer=false;
+        cam.enabled=false;
+        player.GetComponentInChildren<Camera>().enabled=true;
+        player.GetComponentInChildren<MeshRenderer>().enabled=true;
+        player.GetComponent<PlayerController>().enabled=true;
+        player.GetComponentInChildren<Rigidbody>().detectCollisions=true;
+        player.GetComponentInChildren<Rigidbody>().isKinematic=false;
+        player.GetComponentInChildren<PlayerPointer>().enabled=true;
+        cam.GetComponent<CameraController>().enabled = false;
+        player.transform.parent=null;
+        player.transform.position = transform.position + transform.forward*unboardPosition.x+transform.right*unboardPosition.z+transform.up*unboardPosition.y;
+        player.GetComponent<Rigidbody>().velocity=rb.velocity;
     }
     void MouseControls()
     {
         var localTarget = transform.InverseTransformDirection(cam.transform.forward).normalized * 5f;
-        var targetRollAngle = Mathf.Lerp(0f, 30f, Mathf.Abs(localTarget.x));
+        var targetRollAngle = localTarget.z;
         if (localTarget.x > 0f) targetRollAngle *= -1f;
 
         var rollAngle = FindAngle(transform.localEulerAngles.z);
@@ -103,13 +172,16 @@ public class ShipController : MonoBehaviour
     }
 
     private void FixedUpdate() {
-        if(hasPlayer)
+        if(hasPlayer&&isRotating)
         {
-            transform.RotateAround(transform.position, transform.up, yaw * Time.fixedDeltaTime * yawSpeed);     //Yaw
-            transform.RotateAround(transform.position, transform.forward, roll * Time.fixedDeltaTime * rollSpeed);     //Roll
-            transform.RotateAround(transform.position, transform.right, pitch * Time.fixedDeltaTime * pitchSpeed);
+            transform.rotation = Quaternion.Slerp(transform.rotation,cam.transform.rotation,Time.deltaTime);
+            //rb.AddRelativeTorque((rb.transform.forward-cam.transform.forward),ForceMode.VelocityChange);
+            //transform.RotateAround(transform.position, transform.up, yaw * Time.fixedDeltaTime * yawSpeed);     //Yaw
+            //transform.RotateAround(transform.position, transform.forward, roll * Time.fixedDeltaTime * rollSpeed);     //Roll
+            //transform.RotateAround(transform.position, transform.right, pitch * Time.fixedDeltaTime * pitchSpeed);
         }
         CelestialBody[] allBodies = FindObjectsOfType<CelestialBody>();
+        float maxAcceleration=0;
         foreach(var body in allBodies)
         {
             if(body!=this&&body.gameObject.scene==this.gameObject.scene)
@@ -118,28 +190,69 @@ public class ShipController : MonoBehaviour
                 Vector3 forceDir = -(rb.position - body.GetComponent<Rigidbody>().position).normalized;
                 Vector3 acceleration = forceDir * gravityConstant * body.mass * rb.mass / sqrDst;
                 rb.AddForce (acceleration);
+                if (maxAcceleration < acceleration.magnitude) {
+                    maxAcceleration=acceleration.magnitude;
+                    ReferenceBody=body.GetComponent<Rigidbody>();
+                }
             }
         }
-        propControl.x = Mathf.SmoothStep(propControl.x,targetProp.x,10*Time.deltaTime);
-        propControl.y = Mathf.SmoothStep(propControl.y,targetProp.y,10*Time.deltaTime);
-        propControl.z = Mathf.SmoothStep(propControl.z,targetProp.z,10*Time.deltaTime);
+        relativeVelocity = ReferenceBody.velocity-rb.velocity;
+        if(relativeVelocity.magnitude>1)
+        {
+            //cam.fieldOfView = 60 + Mathf.Min(relativeVelocity.magnitude/20,20f);
+            cam.GetComponent<CameraController>().distance = 15 + Mathf.Min(relativeVelocity.magnitude/40,10f);
+        }
+            
+        if(relativeVelocity.magnitude>5)
+        {
+            showMotionVectors=true;
+            progradePosition = cam.WorldToScreenPoint(cam.transform.position - (relativeVelocity.normalized * 500f));
+        }else{
+            showMotionVectors=false;
+        }
+        if(targetProp.x!=0) propControl.x = Mathf.SmoothStep(propControl.x,targetProp.x,10*Time.deltaTime);
+        else propControl.x=0;
+        if(targetProp.y!=0) propControl.y = Mathf.SmoothStep(propControl.y,targetProp.y,10*Time.deltaTime);
+        else propControl.y=0;
+        if(targetProp.z!=0) propControl.z = Mathf.SmoothStep(propControl.z,targetProp.z,10*Time.deltaTime);
+        else propControl.z=0;
+        
         if(propControl.x>0)
         {
-            rb.AddForce(new Vector3(propControl.x*propPower.x,0,0),ForceMode.Acceleration);
+            rb.AddForce(transform.forward*propControl.x*propPower.x,ForceMode.Acceleration);
+            var emission = EngineParticlesForward.emission;
+            emission.rateOverTime = propControl.x*100f;
         }else{
-            rb.AddForce(new Vector3(propControl.x*propPowerNegative.x,0,0),ForceMode.Acceleration);
+            var emission = EngineParticlesForward.emission;
+            emission.rateOverTime = 0;
+            rb.AddForce(transform.forward*propControl.x*propPowerNegative.x,ForceMode.Acceleration);
         }
         if(propControl.y>0)
         {
-            rb.AddForce(new Vector3(0,propControl.y*propPower.y,0),ForceMode.Acceleration);
+            rb.AddForce(transform.up*propControl.y*propPower.y,ForceMode.Acceleration);
         }else{
-            rb.AddForce(new Vector3(0,propControl.y*propPowerNegative.y,0),ForceMode.Acceleration);
+            rb.AddForce(transform.up*propControl.y*propPowerNegative.y,ForceMode.Acceleration);
         }
         if(propControl.z>0)
         {
-            rb.AddForce(new Vector3(0,0,propControl.z*propPower.z),ForceMode.Acceleration);
+            rb.AddForce(transform.right*propControl.z*propPower.z,ForceMode.Acceleration);
         }else{
-            rb.AddForce(new Vector3(0,0,propControl.z*propPowerNegative.z),ForceMode.Acceleration);
+            rb.AddForce(transform.right*propControl.z*propPowerNegative.z,ForceMode.Acceleration);
+        }
+        crosshairPosition = cam.WorldToScreenPoint(transform.position + (transform.forward * 500f));
+        if(hasTarget)
+        {
+            targetDistance = (TargetBody.position-transform.position).magnitude;
+            relativeTargetVelocity = (TargetBody.GetComponent<Rigidbody>().velocity-rb.velocity);
+            relativeTargetVelocityMagnitude = Vector3.Dot(relativeTargetVelocity,targetDirection);
+        }
+    }
+    private void LateUpdate() {
+        if(hasTarget)
+        {
+            targetDirection = (transform.position-TargetBody.position).normalized;
+            targetPosition = cam.WorldToScreenPoint(cam.transform.position-(targetDirection*500f));
+            apparentSize = 2*Mathf.Atan(TargetBody.transform.localScale.x/((TargetBody.position-cam.transform.position).magnitude))*(60/cam.fieldOfView);
         }
     }
 }

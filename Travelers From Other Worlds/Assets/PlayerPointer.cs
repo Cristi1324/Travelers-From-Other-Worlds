@@ -5,18 +5,19 @@ using UnityEngine;
 public class PlayerPointer : MonoBehaviour
 {
     public Transform Origin;
+    public Transform playerTransform;
 
     //public GameObject Parent;
     // Start is called before the first frame update
     void Start()
     {
-        
+        playerTransform = GetComponent<Transform>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.E))
+        if(Input.GetKeyDown(KeyCode.F))
         {
             CastRay();
         }
@@ -29,11 +30,12 @@ public class PlayerPointer : MonoBehaviour
         if (Physics.Raycast(Origin.position, Origin.TransformDirection(Vector3.forward), out hit, 1000f, layerMask))
         {
             Debug.DrawRay(Origin.transform.position, Origin.TransformDirection(Vector3.forward) * hit.distance, Color.yellow);
-            EnterShip enterShip = hit.collider.GetComponent<EnterShip>();
-            if(enterShip!=null)
+            ShipController ship = hit.collider.GetComponent<ShipController>();
+            if(ship!=null)
             {
                 Debug.Log("Hit Ship");
-                BoardShip(enterShip.gameObject);
+                ship.BoardPlayer(gameObject);
+                BoardShip(ship.gameObject);
             }
         }
         else
@@ -44,14 +46,11 @@ public class PlayerPointer : MonoBehaviour
     }
     void BoardShip(GameObject ship)
     {
-        ship.GetComponent<ShipController>().hasPlayer = true;
         GetComponentInChildren<Camera>().enabled=false;
-        GameObject.Find("ShipCamera").GetComponent<Camera>().enabled=true;
         GetComponentInChildren<MeshRenderer>().enabled=false;
         GetComponent<PlayerController>().enabled=false;
         GetComponentInChildren<Rigidbody>().detectCollisions=false;
         GetComponentInChildren<Rigidbody>().isKinematic=true;
-        transform.position = ship.transform.position;
         //transform.parent=ship.transform;
         enabled=false;
     }

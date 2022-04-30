@@ -21,7 +21,7 @@ public class CenterWorld : MonoBehaviour
         playerCamera = Camera.main;
         physicsObjects = new List<Transform> ();
         physicsObjects.Add (player.transform);
-        if(ship!=null)physicsObjects.Add(ship.transform);
+        physicsObjects.Add(ship.transform);
         foreach (var c in bodies) {
             physicsObjects.Add (c.transform);
         }
@@ -39,7 +39,7 @@ public class CenterWorld : MonoBehaviour
     }
 
     void UpdateFloatingOrigin () {
-        if(player!=null)
+        if(!player.transform.IsChildOf(ship.transform))
         {
             originOffset = player.transform.position;
         }else
@@ -51,7 +51,8 @@ public class CenterWorld : MonoBehaviour
 
         if (distanceFromOrigin > distanceThreshold) {
             foreach (Transform t in physicsObjects) {
-                t.position -= originOffset;
+                if(t.parent==null)
+                    t.position -= originOffset;
             }
         }
     }
