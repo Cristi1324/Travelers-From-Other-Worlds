@@ -16,6 +16,7 @@ public class PlayerController : MonoBehaviour
 
     public bool lockCursor;
     Rigidbody rb;
+    public CelestialBody[] bodies;
 
     public float mouseSensitivity = 10;
     public Vector2 pitchMinMax = new Vector2 (-40, 85);
@@ -44,6 +45,9 @@ public class PlayerController : MonoBehaviour
     Vector3 strongestGravitionalPull = Vector3.zero;
     private void Update() {
         HandleMovement ();
+    }
+    private void Start() {
+        bodies = FindObjectsOfType<CelestialBody>();
     }
 
     void Awake () {
@@ -79,8 +83,8 @@ public class PlayerController : MonoBehaviour
             if (relativeVelocity.y <= jumpForce * .5f) {
                 RaycastHit hit;
                 Vector3 offsetToFeet = (feet.position - transform.position);
-                Vector3 rayOrigin = rb.position + offsetToFeet + transform.up * rayRadius;
-                Vector3 rayDir = -transform.up;
+                Vector3 rayOrigin = rb.position + offsetToFeet + playerBody.transform.up * rayRadius;
+                Vector3 rayDir = -playerBody.transform.up;
 
                 grounded = Physics.SphereCast (rayOrigin, rayRadius, rayDir, out hit, groundedRayDst, walkableMask);
                 Debug.DrawRay(rayOrigin,rayDir,Color.red,1000f);
@@ -123,7 +127,6 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate() {
         done=false;
-        CelestialBody[] bodies = FindObjectsOfType<CelestialBody>();
         float maxAcceleration=0;
         CelestialBody maxAccelerationBody = null;
         // Gravity
