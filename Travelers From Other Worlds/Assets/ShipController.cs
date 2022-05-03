@@ -26,7 +26,7 @@ public class ShipController : MonoBehaviour
     public Vector3 rollControl;
     public Vector3 targetProp;
     public Vector3 targetRoll;
-    public bool hasPlayer = false;
+    public bool playerControled;
     public Vector3 propPower;
     public Vector3 propPowerNegative;
     public Camera cam;
@@ -55,6 +55,7 @@ public class ShipController : MonoBehaviour
     {
         projection = FindObjectOfType<Projection>();
         cam.enabled=false;
+        playerControled=false;
     }
     void Awake()
     {
@@ -70,7 +71,7 @@ public class ShipController : MonoBehaviour
         pitch = 0f;
         roll = 0f;
         yaw = 0f;
-        if(hasPlayer)
+        if(playerControled)
         {
         if(Input.GetKey(KeyCode.W))
         {
@@ -105,7 +106,7 @@ public class ShipController : MonoBehaviour
             mapCamera.enabled = true;
             cam.enabled=false;
             mapCamera.GetComponent<MapCamera>().enabled=true;
-            hasPlayer=false;
+            playerControled=false;
             FindObjectOfType<Projection>().enabled=true;
         }
         UpdateCamera();
@@ -128,14 +129,14 @@ public class ShipController : MonoBehaviour
     internal void BoardPlayer(GameObject player)
     {
         this.player = player;
-        hasPlayer=true;
+        playerControled=true;
         cam.enabled=true;
         player.transform.parent = transform;
         cam.GetComponent<CameraController>().enabled = true;
     }
     void UnboardShip()
     {
-        hasPlayer=false;
+        playerControled=false;
         cam.enabled=false;
         player.GetComponentInChildren<Camera>().enabled=true;
         player.GetComponentInChildren<MeshRenderer>().enabled=true;
@@ -172,7 +173,7 @@ public class ShipController : MonoBehaviour
     }
 
     private void FixedUpdate() {
-        if(hasPlayer&&isRotating)
+        if(playerControled&&isRotating)
         {
             transform.rotation = Quaternion.Slerp(transform.rotation,cam.transform.rotation,Time.deltaTime);
             //rb.AddRelativeTorque((rb.transform.forward-cam.transform.forward),ForceMode.VelocityChange);
@@ -197,11 +198,11 @@ public class ShipController : MonoBehaviour
             }
         }
         relativeVelocity = ReferenceBody.velocity-rb.velocity;
-        if(relativeVelocity.magnitude>1)
+        /*if(relativeVelocity.magnitude>1)
         {
             //cam.fieldOfView = 60 + Mathf.Min(relativeVelocity.magnitude/20,20f);
-            cam.GetComponent<CameraController>().distance = 15 + Mathf.Min(relativeVelocity.magnitude/40,10f);
-        }
+            //cam.GetComponent<CameraController>().distance = 15 + Mathf.Min(relativeVelocity.magnitude/40,10f);
+        }*/
             
         if(relativeVelocity.magnitude>5)
         {

@@ -21,7 +21,7 @@ public class MapCamera : MonoBehaviour
     {
         if(Input.GetKeyDown(KeyCode.M))
         {
-            parent.GetComponent<ShipController>().hasPlayer=true;
+            parent.GetComponent<ShipController>().playerControled=true;
             parent.GetComponent<ShipController>().cam.enabled=true;
             GetComponent<Camera>().enabled=false;
             FindObjectOfType<Projection>().enabled=false;

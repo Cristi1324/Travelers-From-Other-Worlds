@@ -27,7 +27,7 @@ public class UIController : MonoBehaviour
         
     }
 
-    void Update()
+    void LateUpdate()
     {
         images = FindObjectsOfType<Image>();
         texts = FindObjectsOfType<TextMeshProUGUI>();
@@ -62,8 +62,8 @@ public class UIController : MonoBehaviour
                 if(ship.relativeTargetVelocityMagnitude>0)
                     TargetTime.color = Color.green;
                 else TargetTime.color = Color.red;
-                TargetTime.GetComponent<RectTransform>().position = targetIndicator.position + new Vector3(ship.apparentSize*250f+50f,ship.apparentSize*100f+10f,0);
-                targetIndicator.GetComponent<RectTransform>().sizeDelta = new Vector2(ship.apparentSize*500f+20f,ship.apparentSize*500f+20f);
+                TargetTime.GetComponent<RectTransform>().position = targetIndicator.position + new Vector3(targetIndicator.sizeDelta.x/3,targetIndicator.sizeDelta.x/8,0);
+                targetIndicator.GetComponent<RectTransform>().sizeDelta = new Vector2(ship.apparentSize*800f+20f,ship.apparentSize*800f+20f);
             }else
             {
                 targetIndicator.gameObject.SetActive(false);
