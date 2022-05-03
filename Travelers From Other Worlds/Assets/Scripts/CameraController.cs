@@ -72,14 +72,12 @@ public class CameraController : MonoBehaviour
                 projection.hasReferenceBody = true;
                 ship.hasTarget = true;
                 ship.TargetBody = hit.collider.transform;
-            }else
-            {
-                projection.hasReferenceBody = false;
-                ship.GetComponent<ShipController>().hasTarget = false;
             }
         }
         else
         {
+            projection.hasReferenceBody = false;
+            ship.GetComponent<ShipController>().hasTarget = false;
             Debug.Log("Did not Hit");
         }
     }

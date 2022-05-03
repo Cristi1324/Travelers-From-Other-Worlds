@@ -51,6 +51,7 @@ public class ShipController : MonoBehaviour
     public Vector3 targetDirection;
     public float targetDistance;
     public float relativeTargetVelocityMagnitude;
+    ShipUI shipUI;
     void Start()
     {
         projection = FindObjectOfType<Projection>();
@@ -63,6 +64,7 @@ public class ShipController : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         enableMouseControls=true;
         EngineParticlesForward = GameObject.Find("ParticlesMainEngine").GetComponent<ParticleSystem>();
+        shipUI = FindObjectOfType<ShipUI>();
     }
 
     // Update is called once per frame
@@ -103,6 +105,9 @@ public class ShipController : MonoBehaviour
         }
         if(Input.GetKeyDown(KeyCode.M))
         {
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.Confined;
+            shipUI.showUI = false;
             mapCamera.enabled = true;
             cam.enabled=false;
             mapCamera.GetComponent<MapCamera>().enabled=true;
@@ -128,6 +133,7 @@ public class ShipController : MonoBehaviour
     }
     internal void BoardPlayer(GameObject player)
     {
+        shipUI.showUI = true;
         this.player = player;
         playerControled=true;
         cam.enabled=true;
@@ -136,6 +142,7 @@ public class ShipController : MonoBehaviour
     }
     void UnboardShip()
     {
+        shipUI.showUI = false;
         playerControled=false;
         cam.enabled=false;
         player.GetComponentInChildren<Camera>().enabled=true;
@@ -203,8 +210,12 @@ public class ShipController : MonoBehaviour
             //cam.fieldOfView = 60 + Mathf.Min(relativeVelocity.magnitude/20,20f);
             //cam.GetComponent<CameraController>().distance = 15 + Mathf.Min(relativeVelocity.magnitude/40,10f);
         }*/
-            
-        if(relativeVelocity.magnitude>5)
+        if (hasTarget)
+        {
+            targetDirection = (transform.position - TargetBody.position).normalized;
+            apparentSize = 2 * Mathf.Atan(TargetBody.transform.localScale.x / ((TargetBody.position - cam.transform.position).magnitude)) * (60 / cam.fieldOfView);
+        }
+        if (relativeVelocity.magnitude>5)
         {
             showMotionVectors=true;
             progradePosition = cam.WorldToScreenPoint(cam.transform.position - (relativeVelocity.normalized * 500f));
@@ -249,11 +260,6 @@ public class ShipController : MonoBehaviour
         }
     }
     private void LateUpdate() {
-        if(hasTarget)
-        {
-            targetDirection = (transform.position-TargetBody.position).normalized;
-            targetPosition = cam.WorldToScreenPoint(cam.transform.position-(targetDirection*500f));
-            apparentSize = 2*Mathf.Atan(TargetBody.transform.localScale.x/((TargetBody.position-cam.transform.position).magnitude))*(60/cam.fieldOfView);
-        }
+        targetPosition = cam.WorldToScreenPoint(cam.transform.position - (targetDirection * 500f));
     }
 }
