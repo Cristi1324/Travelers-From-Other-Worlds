@@ -16,7 +16,7 @@ public class Projection : MonoBehaviour {
     CelestialBody[] celestialBodiesSim;
     Clone[] clones;
     public GameObject SimBody;
-    private int counter = 0;
+    public int counter = 0;
     private void Start() {
         celestialBodies = FindObjectsOfType<CelestialBody>();
         CreatePhysicsScene();
@@ -71,7 +71,7 @@ public class Projection : MonoBehaviour {
         }
             foreach(Clone clone in clones) {
                 clone.gameObject.GetComponent<CelestialBody>().ApplyGravity();
-                clone.gameObject.GetComponentInChildren<TrailRenderer>().AddPosition(clone.gameObject.transform.position);
+                //clone.gameObject.GetComponentInChildren<TrailRenderer>().AddPosition(clone.gameObject.transform.position);
             }
         }
     }

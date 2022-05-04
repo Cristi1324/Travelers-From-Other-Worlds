@@ -109,10 +109,12 @@ public class ShipController : MonoBehaviour
             Cursor.lockState = CursorLockMode.Confined;
             shipUI.showUI = false;
             mapCamera.enabled = true;
-            cam.enabled=false;
-            mapCamera.GetComponent<MapCamera>().enabled=true;
             playerControled=false;
             FindObjectOfType<Projection>().enabled=true;
+            cam.GetComponent<CameraController>().enabled=false;
+            cam.enabled=false;
+            mapCamera.GetComponent<MapCamera>().enabled=true;
+            mapCamera.GetComponent<MapCamera>().CenterCamera();
         }
         UpdateCamera();
         MouseControls();
@@ -130,6 +132,13 @@ public class ShipController : MonoBehaviour
     private void OnCollisionExit(Collision other) {
         if(other.gameObject.layer==8)
             isRotating=true;
+    }
+    internal void setTarget(Transform target)
+    {
+        TargetBody=target;
+        hasTarget=true;
+        projection.ReferenceBody = GameObject.Find(target.gameObject.name+"(Clone)");
+        projection.hasReferenceBody = true;
     }
     internal void BoardPlayer(GameObject player)
     {

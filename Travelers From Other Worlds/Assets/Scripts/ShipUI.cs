@@ -12,6 +12,7 @@ public class ShipUI : MonoBehaviour
     public RectTransform crosshair;
     public RectTransform prograde;
     public RectTransform targetIndicator;
+    public RectTransform circleCrosshair;
     public RectTransform retrograde;
     public TextMeshProUGUI retrogradeText;
     public Image[] images;
@@ -33,8 +34,8 @@ public class ShipUI : MonoBehaviour
 
     void Update()
     {
-        images = FindObjectsOfType<Image>();
-        texts = FindObjectsOfType<TextMeshProUGUI>();
+        images = GetComponentsInChildren<Image>();
+        texts = GetComponentsInChildren<TextMeshProUGUI>();
         if(showUI==false)
         {
             foreach (TextMeshProUGUI text in texts)
@@ -44,12 +45,12 @@ public class ShipUI : MonoBehaviour
         }
         else
         {
-            crosshair.gameObject.SetActive(true);
             if (ship == null)
             {
                 return;
             }
             crosshair.gameObject.SetActive(true);
+            circleCrosshair.gameObject.SetActive(true);
             if (ship.showMotionVectors)
             {
                 speedText.gameObject.SetActive(true);

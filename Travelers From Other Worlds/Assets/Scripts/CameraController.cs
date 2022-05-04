@@ -67,18 +67,13 @@ public class CameraController : MonoBehaviour
         {
             Debug.DrawRay(transform.transform.position, transform.TransformDirection(Vector3.forward) * hit.distance, Color.yellow);
             if(hit.collider.GetComponent<CelestialBody>()){
-                Debug.Log("Hit Planet");
-                projection.ReferenceBody = GameObject.Find(hit.collider.gameObject.name+"(Clone)");
-                projection.hasReferenceBody = true;
-                ship.hasTarget = true;
-                ship.TargetBody = hit.collider.transform;
+                ship.setTarget(hit.collider.transform);
             }
         }
         else
         {
             projection.hasReferenceBody = false;
             ship.GetComponent<ShipController>().hasTarget = false;
-            Debug.Log("Did not Hit");
         }
     }
     void LateUpdate()
