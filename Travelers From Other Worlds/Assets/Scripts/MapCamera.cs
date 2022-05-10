@@ -12,6 +12,7 @@ public class MapCamera : MonoBehaviour
     public Vector3 Offset;
     public float rotateSensitivity;
     public float translationSensitivity;
+    public float zoomSensitivity;
     float zoom;
     float pitch;
     float yaw;
@@ -91,7 +92,7 @@ public class MapCamera : MonoBehaviour
             if (Input.GetMouseButton(2))
             {
                 mouseScreenPositionDelta = (mouseScreenPositionOrigin - mouseScreenPosition) ;
-                parentTransform.position = cameraPositionOrigin + parentTransform.TransformDirection(new Vector3(mouseScreenPositionDelta.x,0,mouseScreenPositionDelta.y)* cameraTransform.position.y * translationSensitivity);
+                parentTransform.position = cameraPositionOrigin + parentTransform.TransformDirection(new Vector3(mouseScreenPositionDelta.x, 0, mouseScreenPositionDelta.y) * cameraTransform.localPosition.y * translationSensitivity);
             }else
             if(Input.GetMouseButton(0))
             {
@@ -105,8 +106,11 @@ public class MapCamera : MonoBehaviour
         }
         float moveHorizontal = Input.GetAxis ("Mouse X");
         float moveVertical = Input.GetAxis ("Mouse Y");
-        zoom = -Input.GetAxis("Mouse ScrollWheel")*cameraTransform.position.magnitude;
-        cameraTransform.position += parentTransform.up*zoom;
-        Debug.Log(Vector3.up*zoom);
+        zoom = -Input.GetAxis("Mouse ScrollWheel")* cameraTransform.localPosition.y;
+        if(Mathf.Abs(zoom)>0.1f)
+        {
+            cameraTransform.localPosition += new Vector3(0, zoomSensitivity * zoom, 0);
+        }
+        Debug.Log(zoom);
     }
 }
