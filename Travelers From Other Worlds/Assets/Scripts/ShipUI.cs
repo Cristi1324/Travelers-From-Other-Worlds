@@ -16,6 +16,7 @@ public class ShipUI : MonoBehaviour
     public RectTransform circleCrosshair;
     public RectTransform retrograde;
     public TextMeshProUGUI retrogradeText;
+    public TextMeshProUGUI altitudeText;
     public Image[] images;
     public TextMeshProUGUI[] texts;
     public bool showUI = false;
@@ -53,6 +54,8 @@ public class ShipUI : MonoBehaviour
             {
                 return;
             }
+            altitudeText.gameObject.SetActive(true);
+            altitudeText.text = $"{(ship.ReferenceBody.position-ship.transform.position).magnitude - ship.ReferenceBody.transform.localScale.x/2}m";
             crosshair.gameObject.SetActive(true);
             circleCrosshair.gameObject.SetActive(true);
             if (ship.showMotionVectors)
@@ -83,8 +86,9 @@ public class ShipUI : MonoBehaviour
                     targetRelativeVelocity = ship.getTargetRelativeVelocity();
                     targetDistance = ship.getTargetDistance();
                     var color = targetIndicator.GetComponent<Image>().color;
-                    int targetTime = (int)(-targetDistance / targetRelativeVelocity);
-                    TimeSpan timeSpan = TimeSpan.FromSeconds(Mathf.Abs(targetTime));
+                    float targetTime = -targetDistance / targetRelativeVelocity;
+                    targetTime = Mathf.Abs(targetTime);
+                    TimeSpan timeSpan = TimeSpan.FromSeconds((double)targetTime);
                     color.a = Mathf.Pow((1 - targetApparentSize), 1);
                     targetIndicator.GetComponent<Image>().color = color;
                     targetIndicator.gameObject.SetActive(true);
@@ -105,7 +109,7 @@ public class ShipUI : MonoBehaviour
                         TargetTime.color = Color.green;
                     else TargetTime.color = Color.red;
                     TargetTime.GetComponent<RectTransform>().position = targetIndicator.position;
-                    targetIndicator.GetComponent<RectTransform>().sizeDelta = new Vector2(targetApparentSize * 800f, targetApparentSize * 800f);
+                    targetIndicator.GetComponent<RectTransform>().sizeDelta = new Vector2(Mathf.Max(targetApparentSize * 800f,50f), Mathf.Max(targetApparentSize * 800f,50f));
                     TargetTime.GetComponent<RectTransform>().anchoredPosition = new Vector2(targetIndicator.anchoredPosition.x + targetIndicator.sizeDelta.x / 2 + 40f, targetIndicator.anchoredPosition.y + targetIndicator.sizeDelta.x / 6);
                 }
                 else{

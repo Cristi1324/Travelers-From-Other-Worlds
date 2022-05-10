@@ -50,6 +50,7 @@ public class MapCamera : MonoBehaviour
         {
             Cursor.visible = false;
             Cursor.lockState = CursorLockMode.Locked;
+            FindObjectOfType<EscMenu>().setOpenMenu(true);
             shipUI.showUI = true;
             ship.GetComponent<ShipController>().playerControled=true;
             ship.GetComponent<ShipController>().cam.enabled=true;
@@ -111,6 +112,5 @@ public class MapCamera : MonoBehaviour
         {
             cameraTransform.localPosition += new Vector3(0, zoomSensitivity * zoom, 0);
         }
-        Debug.Log(zoom);
     }
 }

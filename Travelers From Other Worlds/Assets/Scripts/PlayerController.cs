@@ -24,11 +24,11 @@ public class PlayerController : MonoBehaviour
 
     public float yaw;
     public float pitch;
-    float smoothYaw;
-    float smoothPitch;
+    public float smoothYaw;
+    public float smoothPitch;
 
-    float yawSmoothV;
-    float pitchSmoothV;
+    public float yawSmoothV;
+    public float pitchSmoothV;
     public float relativeVelocityMagnitude;
 
     public Vector3 targetVelocity;
@@ -56,6 +56,13 @@ public class PlayerController : MonoBehaviour
         cam = GetComponentInChildren<Camera> ();
         cameraLocalPos = cam.transform.localPosition;
         InitRigidbody ();
+        yaw = 0;
+        pitch = 0;
+        yawSmoothV = 0;
+        smoothPitch = 0;
+        smoothYaw = 0;
+        pitchSmoothV = 0;
+        yawSmoothV = 0;
 
         if (lockCursor) {
             Cursor.lockState = CursorLockMode.Locked;
@@ -99,9 +106,13 @@ public class PlayerController : MonoBehaviour
         yaw += Input.GetAxisRaw ("Mouse X") * mouseSensitivity;
         pitch -= Input.GetAxisRaw ("Mouse Y") * mouseSensitivity;
         pitch = Mathf.Clamp (pitch - Input.GetAxisRaw ("Mouse Y") * mouseSensitivity, pitchMinMax.x, pitchMinMax.y);
-        smoothPitch = Mathf.SmoothDampAngle (smoothPitch, pitch, ref pitchSmoothV, rotationSmoothTime);
+        //if (!float.IsNaN(Mathf.SmoothDampAngle(smoothPitch, pitch, ref pitchSmoothV, rotationSmoothTime)))
+        //    smoothPitch = Mathf.SmoothDampAngle(smoothPitch, pitch, ref pitchSmoothV, rotationSmoothTime);
+        smoothPitch = pitch;
         float smoothYawOld = smoothYaw;
-        smoothYaw = Mathf.SmoothDampAngle (smoothYaw, yaw, ref yawSmoothV, rotationSmoothTime);
+        //if (!float.IsNaN(Mathf.SmoothDampAngle(smoothYaw, yaw, ref yawSmoothV, rotationSmoothTime)))
+        //    smoothYaw = Mathf.SmoothDampAngle(smoothYaw, yaw, ref yawSmoothV, rotationSmoothTime);
+        smoothYaw = yaw;
         cam.transform.localEulerAngles = Vector3.right * smoothPitch;
         playerBody.transform.Rotate (Vector3.up * Mathf.DeltaAngle (smoothYawOld, smoothYaw), Space.Self);
 

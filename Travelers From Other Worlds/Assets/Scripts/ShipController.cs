@@ -29,7 +29,7 @@ public class ShipController : MonoBehaviour
     Vector3 relativeVelocity;
     ParticleSystem EngineParticlesForward;
     public bool isRotating = true;
-    Rigidbody ReferenceBody;
+    public Rigidbody ReferenceBody;
     public bool enableMouseControls;
     public Vector3 crosshairPosition;
     public Vector3 progradePosition;
@@ -44,6 +44,7 @@ public class ShipController : MonoBehaviour
     float targetDistance;
     float relativeTargetVelocityMagnitude;
     ShipUI shipUI;
+    bool freeRotate = false;
     void Start()
     {
         projection = FindObjectOfType<Projection>();
@@ -123,8 +124,16 @@ public class ShipController : MonoBehaviour
             cam.enabled=false;
             mapCamera.GetComponent<MapCamera>().enabled=true;
             mapCamera.GetComponent<MapCamera>().CenterCamera();
+            FindObjectOfType<EscMenu>().setOpenMenu(false);
         }
-        UpdateCamera();
+        if(Cursor.lockState == CursorLockMode.Locked)
+            UpdateCamera();
+            if (Input.GetKey(KeyCode.LeftAlt))
+            {
+                freeRotate = true;
+            }
+            else
+                freeRotate = false;
         MouseControls();
         }
         targetProp = new Vector3(
@@ -197,7 +206,7 @@ public class ShipController : MonoBehaviour
     }
 
     private void FixedUpdate() {
-        if(playerControled&&isRotating)
+        if(playerControled&&isRotating&&freeRotate==false)
         {
             transform.rotation = Quaternion.Slerp(transform.rotation,cam.transform.rotation,Time.deltaTime);
         }
