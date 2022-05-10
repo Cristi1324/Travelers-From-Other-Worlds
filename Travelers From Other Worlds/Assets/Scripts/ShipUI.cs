@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using System;
 
 public class ShipUI : MonoBehaviour
 {
@@ -18,6 +19,9 @@ public class ShipUI : MonoBehaviour
     public Image[] images;
     public TextMeshProUGUI[] texts;
     public bool showUI = false;
+    float targetApparentSize;
+    float targetRelativeVelocity;
+    float targetDistance;
     private void Start()
     {
         crosshair.gameObject.SetActive(false);
@@ -57,11 +61,11 @@ public class ShipUI : MonoBehaviour
                 prograde.gameObject.SetActive(true);
                 retrograde.gameObject.SetActive(true);
                 retrogradeText.gameObject.SetActive(true);
-                speedText.text = $"{ship.relativeVelocity.magnitude:n0}m/s";
+                speedText.text = $"{ship.getRelativeVelocity().magnitude:n0}m/s";
                 prograde.position = ship.progradePosition;
                 speedText.GetComponent<RectTransform>().position = prograde.position + new Vector3(prograde.rect.size.x, 0, 0);
                 retrograde.position = new Vector3(ship.progradePosition.x, ship.progradePosition.y, -ship.progradePosition.z);
-                retrogradeText.text = $"{-ship.relativeVelocity.magnitude:n0}m/s";
+                retrogradeText.text = $"{-ship.getRelativeVelocity().magnitude:n0}m/s";
                 retrogradeText.GetComponent<RectTransform>().position = retrograde.position + new Vector3(retrograde.rect.size.x,0,0);
             }
             else
@@ -71,26 +75,44 @@ public class ShipUI : MonoBehaviour
                 retrograde.gameObject.SetActive(false);
                 retrogradeText.gameObject.SetActive(false);
             }
-            if (ship.hasTarget && ship.apparentSize < 1)
+            if (ship.hasTarget)
             {
-                var color = targetIndicator.GetComponent<Image>().color;
-                color.a = Mathf.Pow((1 - ship.apparentSize), 2);
-                targetIndicator.GetComponent<Image>().color = color;
-                targetIndicator.gameObject.SetActive(true);
-                TargetTime.gameObject.SetActive(true);
-                targetIndicator.position = ship.targetPosition;
-                if (-ship.targetDistance / ship.relativeTargetVelocityMagnitude > 0)
-                    TargetTime.text = $"T+{-ship.targetDistance / ship.relativeTargetVelocityMagnitude:n0}s";
-                else TargetTime.text = $"T{-ship.targetDistance / ship.relativeTargetVelocityMagnitude:n0}s";
-                if (ship.relativeTargetVelocityMagnitude > 0)
-                    TargetTime.color = Color.green;
-                else TargetTime.color = Color.red;
-                TargetTime.GetComponent<RectTransform>().position = targetIndicator.position;
-                targetIndicator.GetComponent<RectTransform>().sizeDelta = new Vector2(ship.apparentSize * 800f, ship.apparentSize * 800f);
-                TargetTime.GetComponent<RectTransform>().anchoredPosition = new Vector2(targetIndicator.anchoredPosition.x + targetIndicator.sizeDelta.x / 2 + 40f, targetIndicator.anchoredPosition.y + targetIndicator.sizeDelta.x / 6);
-            }
-            else
-            {
+                targetApparentSize = ship.getTargetApparentSize();
+                if(targetApparentSize<1)
+                {
+                    targetRelativeVelocity = ship.getTargetRelativeVelocity();
+                    targetDistance = ship.getTargetDistance();
+                    var color = targetIndicator.GetComponent<Image>().color;
+                    int targetTime = (int)(-targetDistance / targetRelativeVelocity);
+                    TimeSpan timeSpan = TimeSpan.FromSeconds(Mathf.Abs(targetTime));
+                    color.a = Mathf.Pow((1 - targetApparentSize), 1);
+                    targetIndicator.GetComponent<Image>().color = color;
+                    targetIndicator.gameObject.SetActive(true);
+                    TargetTime.gameObject.SetActive(true);
+                    targetIndicator.position = ship.targetPosition;
+                    if(targetTime>0)
+                        TargetTime.text = $"T+";
+                    else TargetTime.text = $"T-";
+                    if(timeSpan.Days!=0)
+                        TargetTime.text += $"{timeSpan.Days}d";
+                    if(timeSpan.Hours!=0)
+                        TargetTime.text += $"{timeSpan.Hours}h";
+                    if(timeSpan.Minutes!=0)
+                        TargetTime.text += $"{timeSpan.Minutes}m";
+                    if(timeSpan.Seconds!=0)
+                        TargetTime.text += $"{timeSpan.Seconds}s";
+                    if (targetRelativeVelocity > 0)
+                        TargetTime.color = Color.green;
+                    else TargetTime.color = Color.red;
+                    TargetTime.GetComponent<RectTransform>().position = targetIndicator.position;
+                    targetIndicator.GetComponent<RectTransform>().sizeDelta = new Vector2(targetApparentSize * 800f, targetApparentSize * 800f);
+                    TargetTime.GetComponent<RectTransform>().anchoredPosition = new Vector2(targetIndicator.anchoredPosition.x + targetIndicator.sizeDelta.x / 2 + 40f, targetIndicator.anchoredPosition.y + targetIndicator.sizeDelta.x / 6);
+                }
+                else{
+                    targetIndicator.gameObject.SetActive(false);
+                    TargetTime.gameObject.SetActive(false);
+                }
+            }else{
                 targetIndicator.gameObject.SetActive(false);
                 TargetTime.gameObject.SetActive(false);
             }

@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.12731749, g: 0.13414757, b: 0.1210787, a: 1}
+  m_IndirectSpecularColor: {r: 0.12731713, g: 0.13414736, b: 0.12107852, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1947,7 +1947,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 60, y: 60}
+  m_SizeDelta: {x: 1677, y: 1678}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1588636642
 MonoBehaviour:
@@ -1962,14 +1962,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0.674, b: 0.009297441, a: 0.42745098}
+  m_Color: {r: 0, g: 0.6132076, b: 0.007130324, a: 0.42745098}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 742014c9a09b73b43b322c036e670337, type: 3}
+  m_Sprite: {fileID: 21300000, guid: eb3482869ad6f244f8958b3723ebe89d, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -2964,12 +2964,32 @@ PrefabInstance:
     - target: {fileID: 1677485488871219625, guid: 354a0aced54a5f64b817b92316b21eec,
         type: 3}
       propertyPath: propPower.x
-      value: 200
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 1677485488871219625, guid: 354a0aced54a5f64b817b92316b21eec,
+        type: 3}
+      propertyPath: propPower.y
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 1677485488871219625, guid: 354a0aced54a5f64b817b92316b21eec,
+        type: 3}
+      propertyPath: propPower.z
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 1677485488871219625, guid: 354a0aced54a5f64b817b92316b21eec,
         type: 3}
       propertyPath: propPowerNegative.x
-      value: 200
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 1677485488871219625, guid: 354a0aced54a5f64b817b92316b21eec,
+        type: 3}
+      propertyPath: propPowerNegative.y
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 1677485488871219625, guid: 354a0aced54a5f64b817b92316b21eec,
+        type: 3}
+      propertyPath: propPowerNegative.z
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 1677485488871219627, guid: 354a0aced54a5f64b817b92316b21eec,
         type: 3}

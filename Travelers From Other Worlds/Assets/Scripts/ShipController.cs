@@ -7,7 +7,7 @@ public class ShipController : MonoBehaviour
     // Start is called before the first frame update
     Rigidbody rb;
     public GameObject player;
-    public CameraController mainCamera;
+    CameraController mainCamera;
     public Vector3 unboardPosition;
     private float gravityConstant = 6.67408f;
     bool propUp = false;
@@ -19,38 +19,30 @@ public class ShipController : MonoBehaviour
     public float pitch;
     public float roll;
     public float yaw;
-    public float pitchSpeed = 100;
-    public float rollSpeed = 100;
-    public float yawSpeed = 100;
-    public Vector3 propControl;
-    public Vector3 rollControl;
-    public Vector3 targetProp;
-    public Vector3 targetRoll;
+    Vector3 propControl;
+    Vector3 targetProp;
     public bool playerControled;
     public Vector3 propPower;
     public Vector3 propPowerNegative;
     public Camera cam;
     public Camera mapCamera;
-    public Vector3 rotationChange;
-    public Vector3 rotateDirection;
-    public Vector3 relativeVelocity;
+    Vector3 relativeVelocity;
     ParticleSystem EngineParticlesForward;
     public bool isRotating = true;
     Rigidbody ReferenceBody;
     public bool enableMouseControls;
     public Vector3 crosshairPosition;
     public Vector3 progradePosition;
-    public bool showCrosshairs;
     public bool showMotionVectors;
     public bool hasTarget;
     public Transform TargetBody;
     public Vector3 targetPosition;
     Projection projection;
-    public float apparentSize;
-    public Vector3 relativeTargetVelocity;
-    public Vector3 targetDirection;
-    public float targetDistance;
-    public float relativeTargetVelocityMagnitude;
+    float apparentSize;
+    Vector3 relativeTargetVelocity;
+    Vector3 targetDirection;
+    float targetDistance;
+    float relativeTargetVelocityMagnitude;
     ShipUI shipUI;
     void Start()
     {
@@ -65,8 +57,24 @@ public class ShipController : MonoBehaviour
         enableMouseControls=true;
         EngineParticlesForward = GameObject.Find("ParticlesMainEngine").GetComponent<ParticleSystem>();
         shipUI = FindObjectOfType<ShipUI>();
+        mainCamera = cam.GetComponent<CameraController>();
     }
-
+    internal Vector3 getRelativeVelocity()
+    {
+        return relativeVelocity;
+    }
+    internal float getTargetApparentSize()
+    {
+        return apparentSize;
+    }
+    internal float getTargetRelativeVelocity()
+    {
+        return relativeTargetVelocityMagnitude;
+    }
+    internal float getTargetDistance()
+    {
+        return targetDistance;
+    }
     // Update is called once per frame
     void Update()
     {
@@ -192,10 +200,6 @@ public class ShipController : MonoBehaviour
         if(playerControled&&isRotating)
         {
             transform.rotation = Quaternion.Slerp(transform.rotation,cam.transform.rotation,Time.deltaTime);
-            //rb.AddRelativeTorque((rb.transform.forward-cam.transform.forward),ForceMode.VelocityChange);
-            //transform.RotateAround(transform.position, transform.up, yaw * Time.fixedDeltaTime * yawSpeed);     //Yaw
-            //transform.RotateAround(transform.position, transform.forward, roll * Time.fixedDeltaTime * rollSpeed);     //Roll
-            //transform.RotateAround(transform.position, transform.right, pitch * Time.fixedDeltaTime * pitchSpeed);
         }
         CelestialBody[] allBodies = FindObjectsOfType<CelestialBody>();
         float maxAcceleration=0;
