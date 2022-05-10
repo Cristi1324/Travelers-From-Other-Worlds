@@ -84,7 +84,7 @@ public class CameraController : MonoBehaviour
         var newDirection = target.position - newPosition;
 
         //transform.rotation = Quaternion.LookRotation(newDirection, ship.up);
-        transform.position = newPosition + new Vector3(heightOffset*transform.up.x, heightOffset*transform.up.y, 0);
+        transform.position = newPosition + new Vector3(0, 0, 0);
 
         rawPosition = newPosition;
     }

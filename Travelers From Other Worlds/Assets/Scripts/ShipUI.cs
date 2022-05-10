@@ -87,8 +87,8 @@ public class ShipUI : MonoBehaviour
                     targetDistance = ship.getTargetDistance();
                     var color = targetIndicator.GetComponent<Image>().color;
                     float targetTime = -targetDistance / targetRelativeVelocity;
-                    targetTime = Mathf.Abs(targetTime);
-                    TimeSpan timeSpan = TimeSpan.FromSeconds((double)targetTime);
+                    targetTime = Math.Min(Mathf.Abs(targetTime),1000000f);
+                    TimeSpan timeSpan = TimeSpan.FromSeconds((int)(targetTime));
                     color.a = Mathf.Pow((1 - targetApparentSize), 1);
                     targetIndicator.GetComponent<Image>().color = color;
                     targetIndicator.gameObject.SetActive(true);

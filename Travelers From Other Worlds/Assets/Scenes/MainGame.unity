@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.12731749, g: 0.13414757, b: 0.1210787, a: 1}
+  m_IndirectSpecularColor: {r: 0.12731713, g: 0.13414736, b: 0.12107852, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -2374,7 +2374,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 185929479}
-  distance: 15
+  distance: 20
   heightOffset: 5
   sensitivity: {x: 5, y: 5}
   smoothing: {x: 3, y: 3}
@@ -2432,7 +2432,7 @@ Camera:
   m_GameObject: {fileID: 1336178098}
   m_Enabled: 0
   serializedVersion: 2
-  m_ClearFlags: 1
+  m_ClearFlags: 2
   m_BackGroundColor: {r: 0, g: 0, b: 0, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
@@ -2933,8 +2933,8 @@ Camera:
   m_GameObject: {fileID: 1519238345}
   m_Enabled: 0
   serializedVersion: 2
-  m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_ClearFlags: 2
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -4214,6 +4214,11 @@ PrefabInstance:
       propertyPath: m_RenderPostProcessing
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 6777669028262315060, guid: b62db15a1be760e458f9bd4699a5e729,
+        type: 3}
+      propertyPath: m_VolumeLayerMask.m_Bits
+      value: 2147483647
+      objectReference: {fileID: 0}
     - target: {fileID: 6848845956125999810, guid: b62db15a1be760e458f9bd4699a5e729,
         type: 3}
       propertyPath: m_Depth
@@ -4227,7 +4232,7 @@ PrefabInstance:
     - target: {fileID: 6848845956125999810, guid: b62db15a1be760e458f9bd4699a5e729,
         type: 3}
       propertyPath: m_ClearFlags
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6848845956125999810, guid: b62db15a1be760e458f9bd4699a5e729,
         type: 3}
