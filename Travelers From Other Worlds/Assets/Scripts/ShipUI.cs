@@ -19,19 +19,14 @@ public class ShipUI : MonoBehaviour
     public TextMeshProUGUI altitudeText;
     public Image[] images;
     public TextMeshProUGUI[] texts;
+    public GameObject shipUI;
     public bool showUI = false;
     float targetApparentSize;
     float targetRelativeVelocity;
     float targetDistance;
     private void Start()
     {
-        crosshair.gameObject.SetActive(false);
-        speedText.gameObject.SetActive(false);
-        prograde.gameObject.SetActive(false);
-        TargetTime.gameObject.SetActive(false);
-        targetIndicator.gameObject.SetActive(false);
-        retrogradeText.gameObject.SetActive(false);
-        retrograde.gameObject.SetActive(false);
+        shipUI.SetActive(false);
     }
     private void Awake() {
         
@@ -43,19 +38,17 @@ public class ShipUI : MonoBehaviour
         texts = GetComponentsInChildren<TextMeshProUGUI>();
         if(showUI==false)
         {
-            foreach (TextMeshProUGUI text in texts)
-                text.gameObject.SetActive(false);
-            foreach (Image image in images)
-                image.gameObject.SetActive(false);
+            shipUI.SetActive(false);
         }
         else
         {
+            shipUI.SetActive(true);
             if (ship == null)
             {
                 return;
             }
             altitudeText.gameObject.SetActive(true);
-            altitudeText.text = $"{(ship.ReferenceBody.position-ship.transform.position).magnitude - ship.ReferenceBody.transform.localScale.x/2}m";
+            altitudeText.text = $"{(int)((ship.ReferenceBody.position-ship.transform.position).magnitude - ship.ReferenceBody.transform.localScale.x/2)}m";
             crosshair.gameObject.SetActive(true);
             circleCrosshair.gameObject.SetActive(true);
             if (ship.showMotionVectors)

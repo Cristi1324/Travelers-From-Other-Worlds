@@ -94,7 +94,7 @@ public class PlayerController : MonoBehaviour
                 Vector3 rayDir = -playerBody.transform.up;
 
                 grounded = Physics.SphereCast (rayOrigin, rayRadius, rayDir, out hit, groundedRayDst, walkableMask);
-                Debug.DrawRay(rayOrigin,rayDir,Color.red,1000f);
+                //Debug.DrawRay(rayOrigin,rayDir,Color.red,1000f);
             }
         }
 

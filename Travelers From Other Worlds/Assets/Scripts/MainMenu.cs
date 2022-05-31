@@ -11,6 +11,8 @@ public class MainMenu : MonoBehaviour
     public Button btnQuit;
     public Button btnOptions;
     public Button btnLoadGame;
+    public GameObject about;
+    public GameObject mainMenu;
     void Start()
     {
         btnNewGame.onClick.AddListener(btnNewGame_Click);
@@ -24,7 +26,7 @@ public class MainMenu : MonoBehaviour
     {
         Cursor.lockState = CursorLockMode.Locked;
         Time.timeScale = 1;
-        SceneManager.LoadScene(1,LoadSceneMode.Single);
+        SceneManager.LoadScene(2,LoadSceneMode.Single);
     }
     void btnQuit_Click()
     {
@@ -32,7 +34,8 @@ public class MainMenu : MonoBehaviour
     }
     void btnOptions_Click()
     {
-        Application.Quit();
+        about.SetActive(true);
+        mainMenu.SetActive(false);
     }
     void btnLoadGame_Click()
     {
