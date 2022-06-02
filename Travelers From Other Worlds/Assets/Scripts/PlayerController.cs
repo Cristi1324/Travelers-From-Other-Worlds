@@ -77,8 +77,6 @@ public class PlayerController : MonoBehaviour
         rb.isKinematic = false;
     }
     bool IsGrounded () {
-        // Sphere must not overlay terrain at origin otherwise no collision will be detected
-        // so rayRadius should not be larger than controller's capsule collider radius
         const float rayRadius = 0.3f;
         const float groundedRayDst = 0.5f;
         bool grounded = false;
@@ -86,7 +84,6 @@ public class PlayerController : MonoBehaviour
         if (referenceBody) {
             var relativeVelocity = rb.velocity - referenceBody.GetComponent<Rigidbody>().velocity;
             relativeVelocityMagnitude=relativeVelocity.magnitude;
-            // Don't cast ray down if player is jumping up from surface
             if (relativeVelocity.y <= jumpForce * .5f) {
                 RaycastHit hit;
                 Vector3 offsetToFeet = (feet.position - transform.position);
@@ -94,18 +91,18 @@ public class PlayerController : MonoBehaviour
                 Vector3 rayDir = -playerBody.transform.up;
 
                 grounded = Physics.SphereCast (rayOrigin, rayRadius, rayDir, out hit, groundedRayDst, walkableMask);
-                //Debug.DrawRay(rayOrigin,rayDir,Color.red,1000f);
             }
         }
 
         return grounded;
     }
     void HandleMovement () {
-        //DebugHelper.HandleEditorInput (lockCursor);
-        // Look input
-        yaw += Input.GetAxisRaw ("Mouse X") * mouseSensitivity;
-        pitch -= Input.GetAxisRaw ("Mouse Y") * mouseSensitivity;
-        pitch = Mathf.Clamp (pitch - Input.GetAxisRaw ("Mouse Y") * mouseSensitivity, pitchMinMax.x, pitchMinMax.y);
+        if(Cursor.lockState == CursorLockMode.Locked)
+        {
+            yaw += Input.GetAxisRaw ("Mouse X") * mouseSensitivity;
+            pitch -= Input.GetAxisRaw ("Mouse Y") * mouseSensitivity;
+            pitch = Mathf.Clamp (pitch - Input.GetAxisRaw ("Mouse Y") * mouseSensitivity, pitchMinMax.x, pitchMinMax.y);
+        }
         //if (!float.IsNaN(Mathf.SmoothDampAngle(smoothPitch, pitch, ref pitchSmoothV, rotationSmoothTime)))
         //    smoothPitch = Mathf.SmoothDampAngle(smoothPitch, pitch, ref pitchSmoothV, rotationSmoothTime);
         smoothPitch = pitch;
@@ -116,8 +113,8 @@ public class PlayerController : MonoBehaviour
         cam.transform.localEulerAngles = Vector3.right * smoothPitch;
         playerBody.transform.Rotate (Vector3.up * Mathf.DeltaAngle (smoothYawOld, smoothYaw), Space.Self);
 
-        // Movement
         isGrounded = IsGrounded();
+
         Vector3 input = new Vector3 (Input.GetAxisRaw ("Horizontal"), 0, Input.GetAxisRaw ("Vertical"));
         float currentSpeed = Input.GetKey (KeyCode.LeftShift) ? runSpeed : walkSpeed;
         targetVelocity = playerBody.transform.TransformDirection (input.normalized) * currentSpeed;
@@ -127,9 +124,6 @@ public class PlayerController : MonoBehaviour
             if (Input.GetKeyDown (KeyCode.Space)) {
                 rb.AddForce (playerBody.transform.up * jumpForce, ForceMode.VelocityChange);
                 isGrounded = false;
-            } else {
-                // Apply small downward force to prevent player from bouncing when going down slopes
-                //rb.AddForce (-transform.up * stickToGroundForce, ForceMode.VelocityChange);
             }
         }
     }
@@ -140,14 +134,13 @@ public class PlayerController : MonoBehaviour
         done=false;
         float maxAcceleration=0;
         CelestialBody maxAccelerationBody = null;
-        // Gravity
+
         foreach (CelestialBody body in bodies) {
             float sqrDst = (body.GetComponent<Rigidbody>().position - rb.position).sqrMagnitude;
             Vector3 forceDir = -(rb.position - body.GetComponent<Rigidbody>().position).normalized;
             Vector3 acceleration = forceDir * gravityConstant * body.mass * rb.mass / sqrDst;
             rb.AddForce (acceleration);
 
-            // Find body with strongest gravitational pull 
             if (maxAcceleration < acceleration.magnitude) {
                 maxAcceleration=acceleration.magnitude;
                 maxAccelerationBody=body;
@@ -155,10 +148,8 @@ public class PlayerController : MonoBehaviour
             //transform.position=rb.position;
         }
         referenceBody = maxAccelerationBody;
-        // Rotate to align with gravity up
         playerBody.rotation = Quaternion.FromToRotation (playerBody.transform.up, playerBody.transform.position - referenceBody.transform.position) * playerBody.transform.rotation;
 
-        // Move
         rb.MovePosition (playerBody.position + smoothVelocity * Time.fixedDeltaTime);
         done=true;
     }

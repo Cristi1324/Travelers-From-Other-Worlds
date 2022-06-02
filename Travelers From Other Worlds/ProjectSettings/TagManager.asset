@@ -8,6 +8,7 @@ TagManager:
   - Sun
   - PlayerBody
   - MapCamera
+  - Ship
   layers:
   - Default
   - TransparentFX

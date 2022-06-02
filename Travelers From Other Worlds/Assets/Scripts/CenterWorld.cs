@@ -13,17 +13,20 @@ public class CenterWorld : MonoBehaviour
     Camera playerCamera;
     public CelestialBody[] bodies;
     public event System.Action PostFloatingOriginUpdate;
+    Transform[] transforms;
 
     void Awake () {
-        bodies = FindObjectsOfType<CelestialBody> ();
-        player = FindObjectOfType<PlayerController>().transform;
-        ship= FindObjectOfType<ShipController>().gameObject;
+        transforms = FindObjectsOfType<Transform>();
+        //bodies = FindObjectsOfType<CelestialBody> ();
+        //player = FindObjectOfType<PlayerController>().transform;
+        //ship= FindObjectOfType<ShipController>().gameObject;
         playerCamera = Camera.main;
-        physicsObjects = new List<Transform> ();
-        physicsObjects.Add (player.transform);
-        physicsObjects.Add(ship.transform);
-        foreach (var c in bodies) {
-            physicsObjects.Add (c.transform);
+        //physicsObjects = new List<Transform> ();
+        //physicsObjects.Add (player.transform);
+        //physicsObjects.Add(ship.transform);
+        foreach (var c in transforms) {
+            if(c.transform.parent == null)
+                physicsObjects.Add (c.transform);
         }
     }
 

@@ -51,7 +51,7 @@ public class EscMenu : MonoBehaviour
     }
     void btnOptions_Click()
     {
-        Application.Quit();
+        //Application.Quit();
     }
     void btnLoadGame_Click()
     {
@@ -59,7 +59,7 @@ public class EscMenu : MonoBehaviour
     }
     void btnReturnToMainMenu_Click()
     {
-        SceneManager.UnloadSceneAsync(1);
-        SceneManager.LoadScene(0,LoadSceneMode.Single);
+        SceneManager.UnloadSceneAsync(2);
+        SceneManager.LoadScene(1,LoadSceneMode.Single);
     }
 }

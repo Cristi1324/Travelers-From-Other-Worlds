@@ -45,6 +45,17 @@ public class ShipController : MonoBehaviour
     float relativeTargetVelocityMagnitude;
     ShipUI shipUI;
     bool freeRotate = false;
+    public bool isShooting = false;
+    public int ammoSize = 10;
+    public int ammoCount = 10;
+    public float reloadTime = 1f;
+    public float fireRate = 0.1f;
+    public float bulletSpeed = 50f;
+    public float bulletLifeTime = 5f;
+    public float cooldownBullet = 0f;
+    public Transform gunLeft;
+    public Transform gunRight;
+    public GameObject bullet;
     void Start()
     {
         projection = FindObjectOfType<Projection>();
@@ -84,6 +95,13 @@ public class ShipController : MonoBehaviour
         yaw = 0f;
         if(playerControled)
         {
+            if (Input.GetMouseButtonDown(0))
+        {
+            isShooting = true;
+        }else if (Input.GetMouseButtonUp(0))
+        {
+            isShooting = false;
+        }
         if(Input.GetKey(KeyCode.W))
         {
             propForward = true;
@@ -141,6 +159,21 @@ public class ShipController : MonoBehaviour
             System.Convert.ToInt32(propUp)-System.Convert.ToInt32(propDown),
             System.Convert.ToInt32(propRight)-System.Convert.ToInt32(propLeft)
         );
+        if(isShooting)
+        {
+            ShootBullets();
+        }
+    }
+    private void OnCollisionEnter(Collision other)
+    {
+        float normalSpeed = Vector3.Dot(-relativeVelocity, (other.transform.position-transform.position).normalized);
+        //Debug.Log("Damage: "+speed + " Normal: "+(other.transform.position-transform.position).normalized);
+        if(normalSpeed>5f)
+        {
+            float damage = normalSpeed;
+            Health health = GetComponent<Health>();
+            health.TakeDamage(damage);
+        }
     }
     private void OnCollisionStay(Collision other) {
         if(other.gameObject.layer==8)
@@ -149,6 +182,33 @@ public class ShipController : MonoBehaviour
     private void OnCollisionExit(Collision other) {
         if(other.gameObject.layer==8)
             isRotating=true;
+    }
+    void ShootBullets()
+    {
+        if(ammoCount>0 && cooldownBullet <= 0)
+        {
+            GameObject bulletClone = Instantiate(bullet, gunLeft.position, gunLeft.rotation);
+            bulletClone.GetComponent<Rigidbody>().velocity = bulletClone.transform.forward * bulletSpeed + rb.velocity;
+            Destroy(bulletClone, bulletLifeTime);
+            GameObject bulletClone2 = Instantiate(bullet, gunRight.position, gunRight.rotation);
+            bulletClone2.GetComponent<Rigidbody>().velocity = bulletClone2.transform.forward * bulletSpeed + rb.velocity;
+            Destroy(bulletClone2, bulletLifeTime);
+            ammoCount--;
+            cooldownBullet = fireRate;
+        }
+        else if(ammoCount<=0)
+        {
+            StartCoroutine(Reload());
+        }
+        else
+        {
+            cooldownBullet -= Time.deltaTime;
+        }
+    }
+    IEnumerator Reload()
+    {
+        yield return new WaitForSeconds(reloadTime);
+        ammoCount = ammoSize;
     }
     internal void setTarget(Transform target)
     {

@@ -20,6 +20,10 @@ public class ShipUI : MonoBehaviour
     public Image[] images;
     public TextMeshProUGUI[] texts;
     public GameObject shipUI;
+    public Image imageHpBar;
+    public Image imageSpBar;
+    public TextMeshProUGUI textHpBar;
+    public TextMeshProUGUI textSpBar;
     public bool showUI = false;
     float targetApparentSize;
     float targetRelativeVelocity;
@@ -47,6 +51,27 @@ public class ShipUI : MonoBehaviour
             {
                 return;
             }
+
+            Health health = ship.GetComponent<Health>();
+            float healthPercent = health.HealthPoints / health.MaxHealthPoints;
+            float shieldPercent = health.ShieldPoints / health.MaxShieldPoints;
+            imageHpBar.fillAmount = healthPercent;
+            imageSpBar.fillAmount = shieldPercent;
+            if (healthPercent > 0.5f)
+            {
+                imageHpBar.color = Color.green;
+            }
+            else if (healthPercent > 0.25f)
+            {
+                imageHpBar.color = Color.yellow;
+            }
+            else
+            {
+                imageHpBar.color = Color.red;
+            }
+            textHpBar.text = "HP:   " + (int)(healthPercent * 100) + "%";
+            textSpBar.text = "SP:   " + (int)(shieldPercent * 100) + "%";
+
             altitudeText.gameObject.SetActive(true);
             altitudeText.text = $"{(int)((ship.ReferenceBody.position-ship.transform.position).magnitude - ship.ReferenceBody.transform.localScale.x/2)}m";
             crosshair.gameObject.SetActive(true);

@@ -108,11 +108,16 @@ MonoBehaviour:
   airSmoothTime: 0.5
   done: 0
   lockCursor: 1
+  bodies: []
   mouseSensitivity: 2.92
   pitchMinMax: {x: -40, y: 85}
   rotationSmoothTime: 0.1
   yaw: 0
   pitch: 1.69
+  smoothYaw: 0
+  smoothPitch: 0
+  yawSmoothV: 0
+  pitchSmoothV: 0
   relativeVelocityMagnitude: 0
   targetVelocity: {x: 0, y: 0, z: 0}
   delta: {x: 0, y: 0, z: 0}
